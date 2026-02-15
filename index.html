@@ -19,6 +19,10 @@
     body { background: #0a0f1a; color: #e2e8f0; font-family: 'Inter', -apple-system, sans-serif; }
     @keyframes spin { to { transform: rotate(360deg); } }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes heroFadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes heroPulse { 0%, 100% { opacity: 0.12; } 50% { opacity: 0.25; } }
+    @keyframes barGrow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+    @keyframes glowPulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 0.8; } }
     #root { min-height: 100vh; }
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: #0a0f1a; }
@@ -369,42 +373,115 @@
       const topWarmth = [...halftimeData].sort((a, b) => getWarmth(b.songs) - getWarmth(a.songs));
       const bbRank = topWarmth.findIndex(s => s.year === 2026) + 1;
       const bbWarmth = getWarmth(halftimeData.find(s => s.year === 2026).songs);
+      const [hoveredBar, setHoveredBar] = useState(null);
+
       return (
-        <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", padding: "40px 20px", textAlign: "center", position: "relative", overflow: "hidden" }}>
-          <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at 30% 20%, #2A9D8F11 0%, transparent 60%), radial-gradient(ellipse at 70% 80%, #7B2D8E11 0%, transparent 60%)", pointerEvents: "none" }} />
-          <div style={{ position: "absolute", inset: 0, opacity: 0.03 }}>
-            {halftimeData.map((d, i) => (
-              <div key={i} style={{ position: "absolute", left: `${(i / halftimeData.length) * 100}%`, bottom: 0, width: `${100 / halftimeData.length - 0.5}%`, height: `${getWarmth(d.songs)}%`, background: d.year === 2026 ? "#2A9D8F" : "#ffffff" }} />
-            ))}
-          </div>
-          <div style={{ position: "relative", zIndex: 1, maxWidth: 700 }}>
-            <div style={{ fontSize: 11, color: "#2A9D8F", fontWeight: 700, letterSpacing: 4, textTransform: "uppercase", marginBottom: 16 }}>Research Project</div>
-            <h1 style={{ fontFamily: "'Oswald', sans-serif", fontSize: "clamp(40px, 8vw, 72px)", fontWeight: 900, margin: 0, lineHeight: 0.95, background: "linear-gradient(135deg, #f8fafc 0%, #94a3b8 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-              WHAT DOES AMERICA<br />CELEBRATE AT HALFTIME?
-            </h1>
-            <p style={{ color: "#94a3b8", fontSize: 16, lineHeight: 1.6, marginTop: 20, maxWidth: 540, marginLeft: "auto", marginRight: "auto" }}>
-              A lyrical theme analysis of every Super Bowl halftime show from 1993–2026. Every song tagged, every theme tracked, every show scored.
-            </p>
-            <div style={{ display: "flex", justifyContent: "center", gap: 24, marginTop: 32, flexWrap: "wrap" }}>
-              {[{ n: halftimeData.length, l: "Shows" }, { n: totalSongs, l: "Songs" }, { n: THEME_LIST.length, l: "Themes" }, { n: "34", l: "Years" }].map(s => (
-                <div key={s.l} style={{ textAlign: "center" }}>
-                  <div style={{ fontSize: 32, fontWeight: 900, color: "#f8fafc", fontFamily: "'Oswald', sans-serif" }}>{s.n}</div>
-                  <div style={{ fontSize: 11, color: "#64748b", textTransform: "uppercase", letterSpacing: 1 }}>{s.l}</div>
+        <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", position: "relative", overflow: "hidden", background: "#0a0f1a" }}>
+
+          {/* Ambient glow layers */}
+          <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at 20% 0%, #2A9D8F18 0%, transparent 50%), radial-gradient(ellipse at 80% 100%, #7B2D8E15 0%, transparent 50%), radial-gradient(ellipse at 50% 50%, #E6394608 0%, transparent 40%)", pointerEvents: "none" }} />
+
+          {/* Top content area */}
+          <div style={{ flex: "1 1 auto", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", padding: "60px 20px 32px", textAlign: "center", position: "relative", zIndex: 2 }}>
+            <div style={{ maxWidth: 720, animation: "heroFadeUp 0.8s ease" }}>
+              <div style={{ fontSize: 11, color: "#2A9D8F", fontWeight: 700, letterSpacing: 5, textTransform: "uppercase", marginBottom: 20 }}>Super Bowl Halftime Theme Analysis</div>
+              <h1 style={{ fontFamily: "'Oswald', sans-serif", fontSize: "clamp(42px, 8vw, 76px)", fontWeight: 900, margin: 0, lineHeight: 0.92, color: "#f8fafc" }}>
+                WHAT DOES AMERICA{"\n"}<br />CELEBRATE AT <span style={{ color: "#2A9D8F" }}>HALFTIME</span>?
+              </h1>
+              <p style={{ color: "#94a3b8", fontSize: 17, lineHeight: 1.7, marginTop: 22, maxWidth: 520, marginLeft: "auto", marginRight: "auto" }}>
+                {halftimeData.length} shows. {totalSongs}+ songs. Every lyric tagged by theme.
+              </p>
+            </div>
+
+            {/* Stat pills */}
+            <div style={{ display: "flex", justifyContent: "center", gap: 12, marginTop: 32, flexWrap: "wrap", animation: "heroFadeUp 0.8s ease 0.15s both" }}>
+              {[{ n: halftimeData.length, l: "Shows", c: "#2A9D8F" }, { n: totalSongs, l: "Songs", c: "#F4A261" }, { n: THEME_LIST.length, l: "Themes", c: "#7B2D8E" }, { n: "34", l: "Years", c: "#E63946" }].map(s => (
+                <div key={s.l} style={{ background: "#0f172a", border: "1px solid #1e293b", borderRadius: 12, padding: "12px 20px", textAlign: "center", minWidth: 90 }}>
+                  <div style={{ fontSize: 28, fontWeight: 900, color: s.c, fontFamily: "'Oswald', sans-serif", lineHeight: 1 }}>{s.n}</div>
+                  <div style={{ fontSize: 10, color: "#64748b", textTransform: "uppercase", letterSpacing: 1.5, marginTop: 2 }}>{s.l}</div>
                 </div>
               ))}
             </div>
-            <div style={{ background: "#2A9D8F11", border: "1px solid #2A9D8F33", borderRadius: 16, padding: "20px 24px", marginTop: 36, textAlign: "left" }}>
-              <div style={{ fontSize: 11, color: "#2A9D8F", fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", marginBottom: 8 }}>The Hypothesis</div>
-              <p style={{ color: "#cbd5e1", fontSize: 14, lineHeight: 1.6, margin: 0 }}>
-                Bad Bunny's 2026 halftime show was a celebration of <strong style={{ color: "#2A9D8F" }}>community, joy, and love</strong> — more so than most recent shows. His performance ranked <strong style={{ color: "#2A9D8F" }}>#{bbRank} out of {halftimeData.length}</strong> in warmth score ({bbWarmth}%), with the field literally transformed into a Puerto Rican neighborhood. Was it empirically warmer than the competition? Explore the data.
-              </p>
+
+            {/* Hypothesis card */}
+            <div style={{ maxWidth: 600, marginTop: 32, animation: "heroFadeUp 0.8s ease 0.3s both" }}>
+              <div style={{ background: "linear-gradient(135deg, #2A9D8F0a, #2A9D8F15)", border: "1px solid #2A9D8F33", borderRadius: 16, padding: "20px 24px", textAlign: "left", backdropFilter: "blur(8px)" }}>
+                <div style={{ fontSize: 10, color: "#2A9D8F", fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", marginBottom: 8 }}>The Hypothesis</div>
+                <p style={{ color: "#cbd5e1", fontSize: 14, lineHeight: 1.65, margin: 0 }}>
+                  Bad Bunny's 2026 halftime show was a celebration of <strong style={{ color: "#2A9D8F" }}>community, joy, and love</strong> — more so than most recent shows. Ranked <strong style={{ color: "#2A9D8F" }}>#{bbRank} of {halftimeData.length}</strong> in warmth ({bbWarmth}%), with the field transformed into a Puerto Rican neighborhood.
+                </p>
+              </div>
             </div>
-            <button onClick={onEnter} style={{ background: "linear-gradient(135deg, #2A9D8F, #1a7a6e)", color: "#fff", border: "none", borderRadius: 12, padding: "14px 36px", fontSize: 15, fontWeight: 700, cursor: "pointer", marginTop: 32, letterSpacing: 0.5, boxShadow: "0 4px 20px #2A9D8F33" }}>
+
+            {/* CTA */}
+            <button onClick={onEnter} style={{
+              background: "linear-gradient(135deg, #2A9D8F, #1a7a6e)", color: "#fff", border: "none", borderRadius: 12,
+              padding: "14px 40px", fontSize: 15, fontWeight: 700, cursor: "pointer", marginTop: 28,
+              letterSpacing: 0.5, boxShadow: "0 4px 24px #2A9D8F44, 0 0 60px #2A9D8F11",
+              animation: "heroFadeUp 0.8s ease 0.45s both", transition: "transform 0.2s, box-shadow 0.2s"
+            }}
+              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 6px 32px #2A9D8F66, 0 0 80px #2A9D8F22"; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 4px 24px #2A9D8F44, 0 0 60px #2A9D8F11"; }}
+            >
               Explore the Data →
             </button>
-            <div style={{ display: "flex", justifyContent: "center", gap: 4, marginTop: 24, flexWrap: "wrap", maxWidth: 500, marginLeft: "auto", marginRight: "auto" }}>
+          </div>
+
+          {/* Bottom visualization: warmth skyline */}
+          <div style={{ position: "relative", width: "100%", height: 180, flexShrink: 0, animation: "heroFadeUp 1s ease 0.5s both" }}>
+            {/* Glow under the bars */}
+            <div style={{ position: "absolute", bottom: 0, left: "5%", right: "5%", height: 60, background: "radial-gradient(ellipse at 50% 100%, #2A9D8F15 0%, transparent 70%)", pointerEvents: "none" }} />
+
+            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "100%", display: "flex", alignItems: "flex-end", justifyContent: "center", gap: 3, padding: "0 20px" }}>
+              {halftimeData.map((d, i) => {
+                const w = getWarmth(d.songs);
+                const isBB = d.year === 2026;
+                const isHovered = hoveredBar === i;
+                const barH = Math.max(12, (w / 100) * 150);
+                return (
+                  <div key={i} style={{ position: "relative", flex: "1 1 0", maxWidth: 28, display: "flex", flexDirection: "column", alignItems: "center" }}
+                    onMouseEnter={() => setHoveredBar(i)} onMouseLeave={() => setHoveredBar(null)}
+                  >
+                    {/* Tooltip */}
+                    {isHovered && (
+                      <div style={{ position: "absolute", bottom: barH + 8, background: "#1e293b", border: "1px solid #334155", borderRadius: 8, padding: "6px 10px", whiteSpace: "nowrap", zIndex: 10, fontSize: 11, color: "#e2e8f0", textAlign: "center", boxShadow: "0 8px 24px rgba(0,0,0,0.4)", pointerEvents: "none" }}>
+                        <div style={{ fontWeight: 800, fontFamily: "'Oswald', sans-serif", fontSize: 13, color: isBB ? "#2A9D8F" : "#f8fafc" }}>{d.year}</div>
+                        <div style={{ fontSize: 10, color: "#94a3b8", marginTop: 1 }}>{d.artist.split(" feat.")[0].split(",")[0]}</div>
+                        <div style={{ fontSize: 10, color: "#2A9D8F", fontWeight: 700, marginTop: 2 }}>{w}% warmth</div>
+                        <div style={{ position: "absolute", bottom: -4, left: "50%", transform: "translateX(-50%) rotate(45deg)", width: 8, height: 8, background: "#1e293b", borderRight: "1px solid #334155", borderBottom: "1px solid #334155" }} />
+                      </div>
+                    )}
+                    {/* Bar */}
+                    <div style={{
+                      width: "100%", height: barH, borderRadius: "4px 4px 0 0", cursor: "pointer",
+                      background: isBB
+                        ? "linear-gradient(to top, #2A9D8F, #34d399)"
+                        : isHovered
+                          ? "linear-gradient(to top, #475569, #94a3b8)"
+                          : "linear-gradient(to top, #1e293b, #334155)",
+                      boxShadow: isBB ? "0 0 20px #2A9D8F44, 0 -4px 12px #2A9D8F22" : "none",
+                      animation: `barGrow 0.6s ease ${0.3 + i * 0.02}s both`,
+                      transformOrigin: "bottom",
+                      transition: "background 0.2s"
+                    }} />
+                    {/* Year label for key shows */}
+                    {(isBB || d.year === 1993 || d.year === 2007) && (
+                      <div style={{ fontSize: 8, color: isBB ? "#2A9D8F" : "#475569", fontWeight: 700, marginTop: 3, fontFamily: "'Oswald', sans-serif" }}>{d.year === 1993 ? "'93" : d.year === 2007 ? "'07" : "'26"}</div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Baseline */}
+            <div style={{ position: "absolute", bottom: 0, left: 16, right: 16, height: 1, background: "linear-gradient(90deg, transparent, #334155, transparent)" }} />
+          </div>
+
+          {/* Theme legend footer */}
+          <div style={{ padding: "12px 20px 24px", textAlign: "center", position: "relative", zIndex: 2, animation: "heroFadeUp 0.8s ease 0.6s both" }}>
+            <div style={{ display: "flex", justifyContent: "center", gap: 4, flexWrap: "wrap", maxWidth: 520, marginLeft: "auto", marginRight: "auto" }}>
               {Object.entries(THEME_COLORS).map(([t, c]) => (
-                <span key={t} style={{ fontSize: 7, padding: "2px 5px", borderRadius: 3, background: c + "22", color: c, border: `1px solid ${c}33` }}>{t}</span>
+                <span key={t} style={{ fontSize: 8, padding: "2px 6px", borderRadius: 4, background: c + "18", color: c, border: `1px solid ${c}22`, letterSpacing: 0.3 }}>{t}</span>
               ))}
             </div>
           </div>
