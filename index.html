@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>What Does America Celebrate at Halftime? | Super Bowl Halftime Theme Analysis</title>
+  <meta name="description" content="A lyrical theme analysis of every Super Bowl halftime show from 1993–2026. 34 shows, 230+ songs tagged by theme." />
+  <meta property="og:title" content="What Does America Celebrate at Halftime?" />
+  <meta property="og:description" content="A lyrical theme analysis of every Super Bowl halftime show from 1993–2026. Was Bad Bunny's 2026 show really about community, joy and love?" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0a0f1a; color: #e2e8f0; font-family: 'Inter', -apple-system, sans-serif; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    #root { min-height: 100vh; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #0a0f1a; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useMemo, useRef, useEffect, useCallback } = React;
+
+    const THEME_COLORS = {
+      "Love/Romance": "#E63946", "Party/Fun": "#FF6B35", "Empowerment": "#7B2D8E",
+      "Community/Unity": "#2A9D8F", "Joy/Celebration": "#F4A261", "Cultural Pride": "#E76F51",
+      "Social Commentary": "#264653", "Sensuality/Desire": "#D4A5A5", "Nostalgia": "#6C757D",
+      "Patriotism": "#1D3557", "Rebellion/Edge": "#474747", "Self-Expression": "#A8DADC",
+      "Spirituality/Hope": "#457B9D", "Heartbreak/Loss": "#6D6875", "Dance/Movement": "#FFB703"
+    };
+    const THEME_LIST = Object.keys(THEME_COLORS);
+    const POSITIVE_THEMES = ["Love/Romance", "Community/Unity", "Joy/Celebration", "Cultural Pride", "Spirituality/Hope"];
+    const EDGE_THEMES = ["Rebellion/Edge", "Sensuality/Desire", "Social Commentary"];
+
+    const halftimeData = [
+      { year: 1993, sb: "XXVII", artist: "Michael Jackson", familyFriendly: 5, notes: "Iconic show that changed halftime forever. Ended with 3,500 children on stage for 'Heal the World'.", songs: [
+        { title: "Jam", themes: ["Party/Fun", "Empowerment", "Dance/Movement"] },
+        { title: "Billie Jean", themes: ["Heartbreak/Loss", "Sensuality/Desire", "Dance/Movement"] },
+        { title: "Black or White", themes: ["Community/Unity", "Social Commentary", "Empowerment"] },
+        { title: "We Are the World", themes: ["Community/Unity", "Spirituality/Hope", "Love/Romance"] },
+        { title: "Heal the World", themes: ["Community/Unity", "Spirituality/Hope", "Love/Romance"] }
+      ]},
+      { year: 1994, sb: "XXVIII", artist: "Clint Black, Tanya Tucker, Travis Tritt & The Judds", familyFriendly: 5, notes: "Country-themed show.", songs: [
+        { title: "Tuckered Out", themes: ["Nostalgia", "Party/Fun"] },
+        { title: "It's a Little Too Late", themes: ["Heartbreak/Loss", "Empowerment"] },
+        { title: "T-R-O-U-B-L-E", themes: ["Party/Fun", "Rebellion/Edge"] },
+        { title: "No One Else on Earth", themes: ["Love/Romance", "Sensuality/Desire"] },
+        { title: "Love Can Build a Bridge", themes: ["Love/Romance", "Community/Unity", "Spirituality/Hope"] }
+      ]},
+      { year: 1995, sb: "XXIX", artist: "Tony Bennett, Patti LaBelle & Miami Sound Machine", familyFriendly: 5, notes: "Disney-themed adventure show.", songs: [
+        { title: "Release Yourself", themes: ["Empowerment", "Dance/Movement", "Party/Fun"] },
+        { title: "Caravan", themes: ["Joy/Celebration", "Dance/Movement"] },
+        { title: "New Attitude", themes: ["Empowerment", "Self-Expression"] },
+        { title: "Can You Feel the Love Tonight", themes: ["Love/Romance", "Spirituality/Hope"] }
+      ]},
+      { year: 1996, sb: "XXX", artist: "Diana Ross", familyFriendly: 5, notes: "Celebratory 30th anniversary show. Diana departed via helicopter.", songs: [
+        { title: "Baby Love", themes: ["Love/Romance", "Joy/Celebration"] },
+        { title: "Stop! In the Name of Love", themes: ["Love/Romance", "Empowerment"] },
+        { title: "Ain't No Mountain High Enough", themes: ["Love/Romance", "Empowerment", "Spirituality/Hope"] },
+        { title: "I Will Survive", themes: ["Empowerment", "Rebellion/Edge"] },
+        { title: "Take Me Higher", themes: ["Joy/Celebration", "Spirituality/Hope", "Dance/Movement"] },
+        { title: "I'm Coming Out", themes: ["Empowerment", "Self-Expression", "Joy/Celebration"] }
+      ]},
+      { year: 1997, sb: "XXXI", artist: "Blues Brothers, James Brown & ZZ Top", familyFriendly: 3, notes: "Blues Brothers reboot with legendary performers.", songs: [
+        { title: "Everybody Needs Somebody to Love", themes: ["Love/Romance", "Community/Unity", "Party/Fun"] },
+        { title: "Soul Man", themes: ["Empowerment", "Cultural Pride", "Party/Fun"] },
+        { title: "I Got You (I Feel Good)", themes: ["Joy/Celebration", "Love/Romance"] },
+        { title: "Sex Machine", themes: ["Sensuality/Desire", "Dance/Movement", "Party/Fun"] },
+        { title: "Tush", themes: ["Sensuality/Desire", "Rebellion/Edge"] },
+        { title: "Legs", themes: ["Sensuality/Desire", "Party/Fun"] },
+        { title: "Gimme Some Lovin'", themes: ["Party/Fun", "Joy/Celebration", "Community/Unity"] }
+      ]},
+      { year: 1998, sb: "XXXII", artist: "Boyz II Men, Smokey Robinson, Temptations & Queen Latifah", familyFriendly: 5, notes: "Motown 40th anniversary tribute.", songs: [
+        { title: "Get Ready", themes: ["Party/Fun", "Dance/Movement"] },
+        { title: "I Can't Help Myself", themes: ["Love/Romance", "Joy/Celebration"] },
+        { title: "The Tracks of My Tears", themes: ["Heartbreak/Loss", "Love/Romance"] },
+        { title: "My Girl", themes: ["Love/Romance", "Joy/Celebration", "Nostalgia"] },
+        { title: "Heat Wave", themes: ["Party/Fun", "Dance/Movement", "Joy/Celebration"] },
+        { title: "Motownphilly", themes: ["Cultural Pride", "Party/Fun", "Dance/Movement"] },
+        { title: "A Song for Mama", themes: ["Love/Romance", "Community/Unity", "Spirituality/Hope"] },
+        { title: "Dancing in the Street", themes: ["Community/Unity", "Joy/Celebration", "Dance/Movement"] }
+      ]},
+      { year: 1999, sb: "XXXIII", artist: "Stevie Wonder & Gloria Estefan", familyFriendly: 5, notes: "Celebration of Soul, Salsa and Swing.", songs: [
+        { title: "Sir Duke", themes: ["Joy/Celebration", "Cultural Pride", "Nostalgia"] },
+        { title: "You Are the Sunshine of My Life", themes: ["Love/Romance", "Joy/Celebration"] },
+        { title: "I Wish", themes: ["Nostalgia", "Joy/Celebration"] },
+        { title: "Oye!", themes: ["Cultural Pride", "Dance/Movement", "Party/Fun"] },
+        { title: "Turn the Beat Around", themes: ["Dance/Movement", "Party/Fun", "Joy/Celebration"] },
+        { title: "My Cherie Amour", themes: ["Love/Romance", "Joy/Celebration"] }
+      ]},
+      { year: 2000, sb: "XXXIV", artist: "Phil Collins, Christina Aguilera, Enrique Iglesias & Toni Braxton", familyFriendly: 5, notes: "Disney Millennium celebration.", songs: [
+        { title: "Celebrate the Future Hand in Hand", themes: ["Community/Unity", "Spirituality/Hope", "Joy/Celebration"] },
+        { title: "Two Worlds", themes: ["Community/Unity", "Spirituality/Hope"] },
+        { title: "We Go On", themes: ["Empowerment", "Spirituality/Hope"] }
+      ]},
+      { year: 2001, sb: "XXXV", artist: "Aerosmith, *NSYNC, Britney Spears & Nelly", familyFriendly: 4, notes: "Rock meets pop collaboration.", songs: [
+        { title: "Bye Bye Bye", themes: ["Empowerment", "Party/Fun", "Dance/Movement"] },
+        { title: "I Don't Want to Miss a Thing", themes: ["Love/Romance", "Spirituality/Hope"] },
+        { title: "It's Gonna Be Me", themes: ["Love/Romance", "Party/Fun"] },
+        { title: "Jaded", themes: ["Heartbreak/Loss", "Rebellion/Edge"] },
+        { title: "Walk This Way", themes: ["Party/Fun", "Rebellion/Edge", "Dance/Movement"] }
+      ]},
+      { year: 2002, sb: "XXXVI", artist: "U2", familyFriendly: 5, notes: "9/11 tribute show. Names of victims scrolled during performance.", songs: [
+        { title: "Beautiful Day", themes: ["Joy/Celebration", "Spirituality/Hope", "Empowerment"] },
+        { title: "MLK", themes: ["Social Commentary", "Spirituality/Hope", "Community/Unity"] },
+        { title: "Where the Streets Have No Name", themes: ["Spirituality/Hope", "Empowerment", "Community/Unity"] }
+      ]},
+      { year: 2003, sb: "XXXVII", artist: "Shania Twain, No Doubt & Sting", familyFriendly: 4, notes: "Strong female empowerment themes.", songs: [
+        { title: "Man! I Feel Like a Woman!", themes: ["Empowerment", "Party/Fun", "Self-Expression"] },
+        { title: "Up!", themes: ["Joy/Celebration", "Empowerment", "Party/Fun"] },
+        { title: "Just a Girl", themes: ["Empowerment", "Social Commentary", "Rebellion/Edge"] },
+        { title: "Message in a Bottle", themes: ["Spirituality/Hope", "Love/Romance"] }
+      ]},
+      { year: 2004, sb: "XXXVIII", artist: "Janet Jackson, Justin Timberlake, P. Diddy, Nelly & Kid Rock", familyFriendly: 1, notes: "The infamous 'wardrobe malfunction' show.", songs: [
+        { title: "All for You", themes: ["Party/Fun", "Sensuality/Desire", "Dance/Movement"] },
+        { title: "Bad Boy for Life", themes: ["Rebellion/Edge", "Party/Fun", "Empowerment"] },
+        { title: "Hot in Herre", themes: ["Sensuality/Desire", "Party/Fun", "Dance/Movement"] },
+        { title: "Rhythm Nation", themes: ["Social Commentary", "Community/Unity", "Empowerment"] },
+        { title: "Rock Your Body", themes: ["Sensuality/Desire", "Dance/Movement", "Party/Fun"] }
+      ]},
+      { year: 2005, sb: "XXXIX", artist: "Paul McCartney", familyFriendly: 5, notes: "Post-Janet Jackson era. 'Hey Jude' singalong was iconic.", songs: [
+        { title: "Drive My Car", themes: ["Party/Fun", "Joy/Celebration"] },
+        { title: "Get Back", themes: ["Nostalgia", "Party/Fun", "Joy/Celebration"] },
+        { title: "Live and Let Die", themes: ["Rebellion/Edge", "Empowerment"] },
+        { title: "Hey Jude", themes: ["Community/Unity", "Spirituality/Hope", "Love/Romance"] }
+      ]},
+      { year: 2006, sb: "XL", artist: "The Rolling Stones", familyFriendly: 3, notes: "Classic rock legends. Lyrics partially censored.", songs: [
+        { title: "Start Me Up", themes: ["Party/Fun", "Rebellion/Edge", "Sensuality/Desire"] },
+        { title: "(I Can't Get No) Satisfaction", themes: ["Rebellion/Edge", "Sensuality/Desire", "Social Commentary"] },
+        { title: "Rough Justice", themes: ["Rebellion/Edge", "Sensuality/Desire"] }
+      ]},
+      { year: 2007, sb: "XLI", artist: "Prince", familyFriendly: 4, notes: "Widely considered the greatest halftime show ever. Performed in the rain.", songs: [
+        { title: "We Will Rock You", themes: ["Empowerment", "Community/Unity", "Party/Fun"] },
+        { title: "Let's Go Crazy", themes: ["Party/Fun", "Joy/Celebration", "Rebellion/Edge"] },
+        { title: "Baby I'm a Star", themes: ["Self-Expression", "Empowerment", "Joy/Celebration"] },
+        { title: "Proud Mary", themes: ["Joy/Celebration", "Dance/Movement", "Nostalgia"] },
+        { title: "1999", themes: ["Party/Fun", "Joy/Celebration", "Dance/Movement"] },
+        { title: "All Along the Watchtower", themes: ["Social Commentary", "Spirituality/Hope", "Rebellion/Edge"] },
+        { title: "Best of You", themes: ["Empowerment", "Rebellion/Edge", "Spirituality/Hope"] },
+        { title: "Purple Rain", themes: ["Spirituality/Hope", "Love/Romance", "Self-Expression"] }
+      ]},
+      { year: 2008, sb: "XLII", artist: "Tom Petty & The Heartbreakers", familyFriendly: 5, notes: "Classic rock Americana.", songs: [
+        { title: "American Girl", themes: ["Empowerment", "Nostalgia", "Joy/Celebration"] },
+        { title: "I Won't Back Down", themes: ["Empowerment", "Rebellion/Edge", "Spirituality/Hope"] },
+        { title: "Free Fallin'", themes: ["Nostalgia", "Love/Romance", "Self-Expression"] },
+        { title: "Runnin' Down a Dream", themes: ["Empowerment", "Joy/Celebration", "Self-Expression"] }
+      ]},
+      { year: 2009, sb: "XLIII", artist: "Bruce Springsteen & The E Street Band", familyFriendly: 5, notes: "The Boss delivers Americana rock.", songs: [
+        { title: "Tenth Avenue Freeze-Out", themes: ["Joy/Celebration", "Community/Unity", "Nostalgia"] },
+        { title: "Born to Run", themes: ["Empowerment", "Joy/Celebration", "Self-Expression"] },
+        { title: "Working on a Dream", themes: ["Spirituality/Hope", "Empowerment"] },
+        { title: "Glory Days", themes: ["Nostalgia", "Joy/Celebration", "Community/Unity"] }
+      ]},
+      { year: 2010, sb: "XLIV", artist: "The Who", familyFriendly: 4, notes: "Classic British rock.", songs: [
+        { title: "Pinball Wizard", themes: ["Self-Expression", "Nostalgia", "Rebellion/Edge"] },
+        { title: "Baba O'Riley", themes: ["Rebellion/Edge", "Self-Expression", "Joy/Celebration"] },
+        { title: "Who Are You", themes: ["Self-Expression", "Rebellion/Edge"] },
+        { title: "See Me, Feel Me", themes: ["Spirituality/Hope", "Community/Unity", "Self-Expression"] },
+        { title: "Won't Get Fooled Again", themes: ["Social Commentary", "Rebellion/Edge", "Empowerment"] }
+      ]},
+      { year: 2011, sb: "XLV", artist: "Black Eyed Peas feat. Usher & Slash", familyFriendly: 3, notes: "Return to pop/hip-hop acts.", songs: [
+        { title: "I Gotta Feeling", themes: ["Party/Fun", "Joy/Celebration", "Community/Unity"] },
+        { title: "Boom Boom Pow", themes: ["Party/Fun", "Dance/Movement", "Empowerment"] },
+        { title: "Sweet Child O' Mine", themes: ["Love/Romance", "Nostalgia"] },
+        { title: "Pump It", themes: ["Party/Fun", "Dance/Movement", "Empowerment"] },
+        { title: "OMG", themes: ["Sensuality/Desire", "Dance/Movement", "Party/Fun"] },
+        { title: "Where Is the Love?", themes: ["Community/Unity", "Social Commentary", "Spirituality/Hope"] },
+        { title: "The Time (Dirty Bit)", themes: ["Party/Fun", "Dance/Movement", "Nostalgia"] }
+      ]},
+      { year: 2012, sb: "XLVI", artist: "Madonna feat. LMFAO, Nicki Minaj, M.I.A. & Cee Lo Green", familyFriendly: 3, notes: "Madonna's spectacle.", songs: [
+        { title: "Vogue", themes: ["Self-Expression", "Empowerment", "Dance/Movement"] },
+        { title: "Music", themes: ["Party/Fun", "Joy/Celebration", "Dance/Movement"] },
+        { title: "Party Rock Anthem", themes: ["Party/Fun", "Dance/Movement", "Joy/Celebration"] },
+        { title: "Give Me All Your Luvin'", themes: ["Love/Romance", "Party/Fun", "Empowerment"] },
+        { title: "Open Your Heart", themes: ["Love/Romance", "Empowerment"] },
+        { title: "Express Yourself", themes: ["Self-Expression", "Empowerment", "Social Commentary"] },
+        { title: "Like a Prayer", themes: ["Spirituality/Hope", "Empowerment", "Community/Unity"] }
+      ]},
+      { year: 2013, sb: "XLVII", artist: "Beyoncé feat. Destiny's Child", familyFriendly: 3, notes: "Beyoncé's powerhouse performance with Destiny's Child reunion.", songs: [
+        { title: "Love on Top", themes: ["Love/Romance", "Joy/Celebration"] },
+        { title: "Crazy in Love", themes: ["Love/Romance", "Sensuality/Desire", "Dance/Movement"] },
+        { title: "End of Time", themes: ["Love/Romance", "Empowerment", "Dance/Movement"] },
+        { title: "Baby Boy", themes: ["Sensuality/Desire", "Dance/Movement"] },
+        { title: "Bootylicious", themes: ["Empowerment", "Sensuality/Desire", "Party/Fun"] },
+        { title: "Independent Women, Pt. 1", themes: ["Empowerment", "Self-Expression"] },
+        { title: "Single Ladies (Put a Ring on It)", themes: ["Empowerment", "Dance/Movement", "Love/Romance"] },
+        { title: "Halo", themes: ["Love/Romance", "Spirituality/Hope"] }
+      ]},
+      { year: 2014, sb: "XLVIII", artist: "Bruno Mars feat. Red Hot Chili Peppers", familyFriendly: 4, notes: "Bruno Mars brought infectious energy and romance.", songs: [
+        { title: "Billionaire", themes: ["Self-Expression", "Empowerment"] },
+        { title: "Locked Out of Heaven", themes: ["Love/Romance", "Sensuality/Desire", "Joy/Celebration"] },
+        { title: "Treasure", themes: ["Love/Romance", "Joy/Celebration", "Dance/Movement"] },
+        { title: "Runaway Baby", themes: ["Party/Fun", "Rebellion/Edge", "Dance/Movement"] },
+        { title: "Give It Away", themes: ["Party/Fun", "Rebellion/Edge", "Self-Expression"] },
+        { title: "Just the Way You Are", themes: ["Love/Romance", "Empowerment", "Joy/Celebration"] }
+      ]},
+      { year: 2015, sb: "XLIX", artist: "Katy Perry feat. Lenny Kravitz & Missy Elliott", familyFriendly: 3, notes: "Most-watched halftime show at the time. 'Left Shark' became iconic.", songs: [
+        { title: "Roar", themes: ["Empowerment", "Self-Expression", "Rebellion/Edge"] },
+        { title: "Dark Horse", themes: ["Empowerment", "Sensuality/Desire", "Rebellion/Edge"] },
+        { title: "I Kissed a Girl", themes: ["Self-Expression", "Rebellion/Edge", "Sensuality/Desire"] },
+        { title: "Teenage Dream", themes: ["Love/Romance", "Nostalgia", "Joy/Celebration"] },
+        { title: "California Gurls", themes: ["Party/Fun", "Joy/Celebration", "Self-Expression"] },
+        { title: "Get Ur Freak On", themes: ["Party/Fun", "Dance/Movement", "Empowerment"] },
+        { title: "Work It", themes: ["Empowerment", "Dance/Movement", "Self-Expression"] },
+        { title: "Firework", themes: ["Empowerment", "Self-Expression", "Spirituality/Hope"] }
+      ]},
+      { year: 2016, sb: "50", artist: "Coldplay feat. Beyoncé & Bruno Mars", familyFriendly: 4, notes: "Ended with 'Believe in Love' message.", songs: [
+        { title: "Yellow", themes: ["Love/Romance", "Spirituality/Hope"] },
+        { title: "Viva la Vida", themes: ["Spirituality/Hope", "Nostalgia", "Empowerment"] },
+        { title: "Paradise", themes: ["Spirituality/Hope", "Joy/Celebration", "Self-Expression"] },
+        { title: "Adventure of a Lifetime", themes: ["Joy/Celebration", "Love/Romance", "Dance/Movement"] },
+        { title: "Uptown Funk", themes: ["Party/Fun", "Dance/Movement", "Joy/Celebration"] },
+        { title: "Formation", themes: ["Cultural Pride", "Empowerment", "Social Commentary"] },
+        { title: "Fix You", themes: ["Spirituality/Hope", "Love/Romance", "Community/Unity"] },
+        { title: "Up&Up", themes: ["Community/Unity", "Spirituality/Hope", "Joy/Celebration"] }
+      ]},
+      { year: 2017, sb: "LI", artist: "Lady Gaga", familyFriendly: 3, notes: "First halftime show to reference LGBTQ community.", songs: [
+        { title: "God Bless America / This Land Is Your Land", themes: ["Patriotism", "Community/Unity"] },
+        { title: "Poker Face", themes: ["Sensuality/Desire", "Self-Expression", "Party/Fun"] },
+        { title: "Born This Way", themes: ["Empowerment", "Self-Expression", "Social Commentary"] },
+        { title: "Telephone", themes: ["Party/Fun", "Rebellion/Edge", "Self-Expression"] },
+        { title: "Just Dance", themes: ["Party/Fun", "Dance/Movement", "Joy/Celebration"] },
+        { title: "Million Reasons", themes: ["Heartbreak/Loss", "Spirituality/Hope", "Love/Romance"] },
+        { title: "Bad Romance", themes: ["Love/Romance", "Sensuality/Desire", "Rebellion/Edge"] },
+        { title: "The Edge of Glory", themes: ["Empowerment", "Spirituality/Hope", "Joy/Celebration"] }
+      ]},
+      { year: 2018, sb: "LII", artist: "Justin Timberlake", familyFriendly: 3, notes: "JT's return 14 years after the Janet Jackson incident.", songs: [
+        { title: "Filthy", themes: ["Sensuality/Desire", "Dance/Movement", "Party/Fun"] },
+        { title: "Rock Your Body", themes: ["Sensuality/Desire", "Dance/Movement", "Party/Fun"] },
+        { title: "SexyBack", themes: ["Sensuality/Desire", "Dance/Movement", "Party/Fun"] },
+        { title: "My Love", themes: ["Love/Romance", "Sensuality/Desire"] },
+        { title: "Cry Me a River", themes: ["Heartbreak/Loss", "Sensuality/Desire"] },
+        { title: "Suit & Tie", themes: ["Self-Expression", "Party/Fun", "Sensuality/Desire"] },
+        { title: "Mirrors", themes: ["Love/Romance", "Spirituality/Hope"] },
+        { title: "Can't Stop the Feeling!", themes: ["Joy/Celebration", "Dance/Movement", "Community/Unity"] }
+      ]},
+      { year: 2019, sb: "LIII", artist: "Maroon 5 feat. Travis Scott & Big Boi", familyFriendly: 3, notes: "Controversial show.", songs: [
+        { title: "Harder to Breathe", themes: ["Rebellion/Edge", "Sensuality/Desire"] },
+        { title: "This Love", themes: ["Love/Romance", "Heartbreak/Loss"] },
+        { title: "Girls Like You", themes: ["Love/Romance", "Self-Expression"] },
+        { title: "She Will Be Loved", themes: ["Love/Romance", "Heartbreak/Loss", "Spirituality/Hope"] },
+        { title: "Sicko Mode", themes: ["Party/Fun", "Rebellion/Edge", "Self-Expression"] },
+        { title: "The Way You Move", themes: ["Sensuality/Desire", "Dance/Movement", "Party/Fun"] },
+        { title: "Sugar", themes: ["Love/Romance", "Joy/Celebration", "Party/Fun"] },
+        { title: "Moves Like Jagger", themes: ["Sensuality/Desire", "Dance/Movement", "Party/Fun"] }
+      ]},
+      { year: 2020, sb: "LIV", artist: "Shakira & Jennifer Lopez feat. Bad Bunny & J Balvin", familyFriendly: 2, notes: "Historic Latina-led show. Puerto Rican flag prominently displayed.", songs: [
+        { title: "She Wolf", themes: ["Empowerment", "Sensuality/Desire", "Self-Expression"] },
+        { title: "Empire", themes: ["Empowerment", "Love/Romance"] },
+        { title: "Whenever, Wherever", themes: ["Joy/Celebration", "Cultural Pride", "Dance/Movement"] },
+        { title: "I Like It", themes: ["Cultural Pride", "Party/Fun", "Sensuality/Desire"] },
+        { title: "Mi Gente", themes: ["Cultural Pride", "Community/Unity", "Party/Fun"] },
+        { title: "Hips Don't Lie", themes: ["Sensuality/Desire", "Dance/Movement", "Cultural Pride"] },
+        { title: "Jenny from the Block", themes: ["Cultural Pride", "Empowerment", "Self-Expression"] },
+        { title: "Get Right", themes: ["Sensuality/Desire", "Dance/Movement", "Party/Fun"] },
+        { title: "Waiting for Tonight", themes: ["Love/Romance", "Dance/Movement", "Party/Fun"] },
+        { title: "On the Floor", themes: ["Party/Fun", "Dance/Movement", "Joy/Celebration"] },
+        { title: "Let's Get Loud", themes: ["Empowerment", "Party/Fun", "Joy/Celebration"] },
+        { title: "Waka Waka", themes: ["Community/Unity", "Joy/Celebration", "Cultural Pride"] }
+      ]},
+      { year: 2021, sb: "LV", artist: "The Weeknd", familyFriendly: 2, notes: "Moody, artistic performance. The Weeknd invested $7M of his own money.", songs: [
+        { title: "Starboy", themes: ["Self-Expression", "Rebellion/Edge", "Empowerment"] },
+        { title: "The Hills", themes: ["Sensuality/Desire", "Rebellion/Edge", "Heartbreak/Loss"] },
+        { title: "Can't Feel My Face", themes: ["Sensuality/Desire", "Party/Fun", "Rebellion/Edge"] },
+        { title: "I Feel It Coming", themes: ["Love/Romance", "Sensuality/Desire"] },
+        { title: "Save Your Tears", themes: ["Heartbreak/Loss", "Love/Romance"] },
+        { title: "Earned It", themes: ["Sensuality/Desire", "Love/Romance"] },
+        { title: "House of Balloons", themes: ["Sensuality/Desire", "Rebellion/Edge", "Party/Fun"] },
+        { title: "Blinding Lights", themes: ["Love/Romance", "Nostalgia", "Dance/Movement"] }
+      ]},
+      { year: 2022, sb: "LVI", artist: "Dr. Dre, Snoop Dogg, Eminem, Mary J. Blige & Kendrick Lamar", familyFriendly: 2, notes: "Historic hip-hop celebration. Eminem took a knee.", songs: [
+        { title: "Next Episode", themes: ["Party/Fun", "Rebellion/Edge", "Cultural Pride"] },
+        { title: "California Love", themes: ["Cultural Pride", "Party/Fun", "Community/Unity"] },
+        { title: "In Da Club", themes: ["Party/Fun", "Dance/Movement", "Joy/Celebration"] },
+        { title: "Family Affair", themes: ["Party/Fun", "Dance/Movement", "Community/Unity"] },
+        { title: "No More Drama", themes: ["Empowerment", "Heartbreak/Loss", "Spirituality/Hope"] },
+        { title: "m.A.A.d city", themes: ["Social Commentary", "Cultural Pride", "Rebellion/Edge"] },
+        { title: "Alright", themes: ["Social Commentary", "Empowerment", "Spirituality/Hope"] },
+        { title: "Lose Yourself", themes: ["Empowerment", "Self-Expression", "Spirituality/Hope"] },
+        { title: "Still D.R.E.", themes: ["Empowerment", "Cultural Pride", "Rebellion/Edge"] }
+      ]},
+      { year: 2023, sb: "LVII", artist: "Rihanna", familyFriendly: 2, notes: "Rihanna's comeback after 7 years. Performed while visibly pregnant.", songs: [
+        { title: "Bitch Better Have My Money", themes: ["Empowerment", "Rebellion/Edge"] },
+        { title: "Where Have You Been", themes: ["Dance/Movement", "Love/Romance", "Sensuality/Desire"] },
+        { title: "Only Girl (In the World)", themes: ["Love/Romance", "Empowerment", "Dance/Movement"] },
+        { title: "We Found Love", themes: ["Love/Romance", "Joy/Celebration", "Dance/Movement"] },
+        { title: "Rude Boy", themes: ["Sensuality/Desire", "Dance/Movement", "Party/Fun"] },
+        { title: "Work", themes: ["Dance/Movement", "Sensuality/Desire", "Cultural Pride"] },
+        { title: "Wild Thoughts", themes: ["Sensuality/Desire", "Love/Romance", "Party/Fun"] },
+        { title: "Pour It Up", themes: ["Empowerment", "Party/Fun", "Rebellion/Edge"] },
+        { title: "All of the Lights", themes: ["Social Commentary", "Self-Expression", "Community/Unity"] },
+        { title: "Umbrella", themes: ["Love/Romance", "Empowerment", "Community/Unity"] },
+        { title: "Diamonds", themes: ["Love/Romance", "Spirituality/Hope", "Empowerment"] }
+      ]},
+      { year: 2024, sb: "LVIII", artist: "Usher feat. Alicia Keys, Ludacris, Lil Jon & others", familyFriendly: 3, notes: "Usher's career-spanning set. Roller-skated on stage.", songs: [
+        { title: "Caught Up", themes: ["Love/Romance", "Sensuality/Desire", "Dance/Movement"] },
+        { title: "U Don't Have to Call", themes: ["Love/Romance", "Heartbreak/Loss"] },
+        { title: "Love in This Club", themes: ["Love/Romance", "Sensuality/Desire", "Party/Fun"] },
+        { title: "Yeah!", themes: ["Party/Fun", "Dance/Movement", "Joy/Celebration"] },
+        { title: "My Boo", themes: ["Love/Romance", "Nostalgia"] },
+        { title: "If I Ain't Got You", themes: ["Love/Romance", "Spirituality/Hope"] },
+        { title: "Burn", themes: ["Heartbreak/Loss", "Love/Romance"] },
+        { title: "OMG", themes: ["Party/Fun", "Sensuality/Desire", "Dance/Movement"] },
+        { title: "DJ Got Us Fallin' in Love", themes: ["Love/Romance", "Party/Fun", "Dance/Movement"] }
+      ]},
+      { year: 2025, sb: "LIX", artist: "Kendrick Lamar feat. SZA", familyFriendly: 2, notes: "Kendrick's solo headline. Heavy social commentary.", songs: [
+        { title: "HUMBLE.", themes: ["Empowerment", "Rebellion/Edge", "Social Commentary"] },
+        { title: "Swimming Pools (Drank)", themes: ["Social Commentary", "Rebellion/Edge"] },
+        { title: "m.A.A.d city", themes: ["Social Commentary", "Cultural Pride", "Rebellion/Edge"] },
+        { title: "All the Stars", themes: ["Love/Romance", "Spirituality/Hope", "Cultural Pride"] },
+        { title: "DNA.", themes: ["Empowerment", "Cultural Pride", "Rebellion/Edge"] },
+        { title: "Not Like Us", themes: ["Empowerment", "Rebellion/Edge", "Cultural Pride"] },
+        { title: "LOVE.", themes: ["Love/Romance", "Spirituality/Hope"] },
+        { title: "Alright", themes: ["Social Commentary", "Empowerment", "Spirituality/Hope"] }
+      ]},
+      { year: 2026, sb: "LX", artist: "Bad Bunny feat. Lady Gaga & Ricky Martin", familyFriendly: 3, notes: "Historic first primarily Spanish-language halftime show. Field transformed into a Puerto Rican town with market, food stands, and a wedding ceremony. Celebrity cameos from Pedro Pascal, Jessica Alba, Cardi B, and Karol G.", songs: [
+        { title: "Tití Me Preguntó", themes: ["Sensuality/Desire", "Party/Fun", "Dance/Movement"] },
+        { title: "Yo Perreo Sola", themes: ["Empowerment", "Social Commentary", "Dance/Movement"] },
+        { title: "Safaera", themes: ["Party/Fun", "Dance/Movement", "Sensuality/Desire"] },
+        { title: "Solita", themes: ["Party/Fun", "Dance/Movement", "Sensuality/Desire"] },
+        { title: "Party", themes: ["Party/Fun", "Dance/Movement", "Joy/Celebration"] },
+        { title: "Voy a Llevarte Pa PR", themes: ["Cultural Pride", "Love/Romance", "Community/Unity"] },
+        { title: "EoO", themes: ["Party/Fun", "Dance/Movement", "Joy/Celebration"] },
+        { title: "Monaco", themes: ["Empowerment", "Self-Expression", "Party/Fun"] },
+        { title: "Gasolina (tribute)", themes: ["Cultural Pride", "Party/Fun", "Dance/Movement"] },
+        { title: "Dale (tribute)", themes: ["Cultural Pride", "Party/Fun", "Dance/Movement"] },
+        { title: "Die With a Smile (Lady Gaga)", themes: ["Love/Romance", "Heartbreak/Loss", "Joy/Celebration"] },
+        { title: "Baile Inolvidable", themes: ["Love/Romance", "Joy/Celebration", "Cultural Pride", "Dance/Movement"] },
+        { title: "Nuevayol", themes: ["Cultural Pride", "Nostalgia", "Community/Unity"] },
+        { title: "Lo Que Le Pasó a Hawaii (w/ Ricky Martin)", themes: ["Social Commentary", "Cultural Pride", "Community/Unity"] },
+        { title: "El Apagón", themes: ["Social Commentary", "Cultural Pride", "Community/Unity", "Empowerment"] },
+        { title: "Café Con Ron", themes: ["Community/Unity", "Joy/Celebration", "Cultural Pride"] },
+        { title: "Debí Tirar Más Fotos", themes: ["Nostalgia", "Love/Romance", "Cultural Pride", "Community/Unity"] }
+      ]}
+    ];
+
+    const totalSongs = halftimeData.reduce((s, d) => s + d.songs.length, 0);
+
+    function getThemeCounts(songs) { const c = {}; songs.forEach(s => s.themes.forEach(t => { c[t] = (c[t] || 0) + 1; })); return Object.entries(c).sort((a, b) => b[1] - a[1]); }
+    function getWarmth(songs) { let t = 0, m = 0; songs.forEach(s => s.themes.forEach(th => { t++; if (POSITIVE_THEMES.includes(th)) m++; })); return t > 0 ? Math.round((m / t) * 100) : 0; }
+    function getEdge(songs) { let t = 0, m = 0; songs.forEach(s => s.themes.forEach(th => { t++; if (EDGE_THEMES.includes(th)) m++; })); return t > 0 ? Math.round((m / t) * 100) : 0; }
+
+    function ThemePill({ theme }) {
+      return <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 4, background: (THEME_COLORS[theme]||"#666") + "33", color: THEME_COLORS[theme]||"#666", border: `1px solid ${(THEME_COLORS[theme]||"#666")}44`, whiteSpace: "nowrap", display: "inline-block" }}>{theme}</span>;
+    }
+
+    function ThemeBar({ theme, count, max }) {
+      return (
+        <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 2 }}>
+          <div style={{ width: 110, fontSize: 10, color: "#94a3b8", textAlign: "right", flexShrink: 0 }}>{theme}</div>
+          <div style={{ flex: 1, height: 14, background: "#1e293b", borderRadius: 3, overflow: "hidden", position: "relative" }}>
+            <div style={{ width: `${max > 0 ? (count / max) * 100 : 0}%`, height: "100%", background: THEME_COLORS[theme] || "#666", borderRadius: 3, transition: "width 0.5s" }} />
+            {count > 0 && <span style={{ position: "absolute", right: 4, top: 0, fontSize: 9, color: "#cbd5e1", lineHeight: "14px" }}>{count}</span>}
+          </div>
+        </div>
+      );
+    }
+
+    function HeroPage({ onEnter }) {
+      const topWarmth = [...halftimeData].sort((a, b) => getWarmth(b.songs) - getWarmth(a.songs));
+      const bbRank = topWarmth.findIndex(s => s.year === 2026) + 1;
+      const bbWarmth = getWarmth(halftimeData.find(s => s.year === 2026).songs);
+      return (
+        <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", padding: "40px 20px", textAlign: "center", position: "relative", overflow: "hidden" }}>
+          <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at 30% 20%, #2A9D8F11 0%, transparent 60%), radial-gradient(ellipse at 70% 80%, #7B2D8E11 0%, transparent 60%)", pointerEvents: "none" }} />
+          <div style={{ position: "absolute", inset: 0, opacity: 0.03 }}>
+            {halftimeData.map((d, i) => (
+              <div key={i} style={{ position: "absolute", left: `${(i / halftimeData.length) * 100}%`, bottom: 0, width: `${100 / halftimeData.length - 0.5}%`, height: `${getWarmth(d.songs)}%`, background: d.year === 2026 ? "#2A9D8F" : "#ffffff" }} />
+            ))}
+          </div>
+          <div style={{ position: "relative", zIndex: 1, maxWidth: 700 }}>
+            <div style={{ fontSize: 11, color: "#2A9D8F", fontWeight: 700, letterSpacing: 4, textTransform: "uppercase", marginBottom: 16 }}>Research Project</div>
+            <h1 style={{ fontFamily: "'Oswald', sans-serif", fontSize: "clamp(40px, 8vw, 72px)", fontWeight: 900, margin: 0, lineHeight: 0.95, background: "linear-gradient(135deg, #f8fafc 0%, #94a3b8 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+              WHAT DOES AMERICA<br />CELEBRATE AT HALFTIME?
+            </h1>
+            <p style={{ color: "#94a3b8", fontSize: 16, lineHeight: 1.6, marginTop: 20, maxWidth: 540, marginLeft: "auto", marginRight: "auto" }}>
+              A lyrical theme analysis of every Super Bowl halftime show from 1993–2026. Every song tagged, every theme tracked, every show scored.
+            </p>
+            <div style={{ display: "flex", justifyContent: "center", gap: 24, marginTop: 32, flexWrap: "wrap" }}>
+              {[{ n: halftimeData.length, l: "Shows" }, { n: totalSongs, l: "Songs" }, { n: THEME_LIST.length, l: "Themes" }, { n: "34", l: "Years" }].map(s => (
+                <div key={s.l} style={{ textAlign: "center" }}>
+                  <div style={{ fontSize: 32, fontWeight: 900, color: "#f8fafc", fontFamily: "'Oswald', sans-serif" }}>{s.n}</div>
+                  <div style={{ fontSize: 11, color: "#64748b", textTransform: "uppercase", letterSpacing: 1 }}>{s.l}</div>
+                </div>
+              ))}
+            </div>
+            <div style={{ background: "#2A9D8F11", border: "1px solid #2A9D8F33", borderRadius: 16, padding: "20px 24px", marginTop: 36, textAlign: "left" }}>
+              <div style={{ fontSize: 11, color: "#2A9D8F", fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", marginBottom: 8 }}>The Hypothesis</div>
+              <p style={{ color: "#cbd5e1", fontSize: 14, lineHeight: 1.6, margin: 0 }}>
+                Bad Bunny's 2026 halftime show was a celebration of <strong style={{ color: "#2A9D8F" }}>community, joy, and love</strong> — more so than most recent shows. His performance ranked <strong style={{ color: "#2A9D8F" }}>#{bbRank} out of {halftimeData.length}</strong> in warmth score ({bbWarmth}%), with the field literally transformed into a Puerto Rican neighborhood. Was it empirically warmer than the competition? Explore the data.
+              </p>
+            </div>
+            <button onClick={onEnter} style={{ background: "linear-gradient(135deg, #2A9D8F, #1a7a6e)", color: "#fff", border: "none", borderRadius: 12, padding: "14px 36px", fontSize: 15, fontWeight: 700, cursor: "pointer", marginTop: 32, letterSpacing: 0.5, boxShadow: "0 4px 20px #2A9D8F33" }}>
+              Explore the Data →
+            </button>
+            <div style={{ display: "flex", justifyContent: "center", gap: 4, marginTop: 24, flexWrap: "wrap", maxWidth: 500, marginLeft: "auto", marginRight: "auto" }}>
+              {Object.entries(THEME_COLORS).map(([t, c]) => (
+                <span key={t} style={{ fontSize: 7, padding: "2px 5px", borderRadius: 3, background: c + "22", color: c, border: `1px solid ${c}33` }}>{t}</span>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function RankingView({ data, onSelect }) {
+      const ranked = [...data].map(s => ({ ...s, warmth: getWarmth(s.songs), edge: getEdge(s.songs) })).sort((a, b) => b.warmth - a.warmth);
+      const bbRank = ranked.findIndex(s => s.year === 2026) + 1;
+      const bb = ranked.find(s => s.year === 2026);
+      return (
+        <div>
+          <div style={{ display: "flex", gap: 16, marginBottom: 20, flexWrap: "wrap" }}>
+            <div style={{ flex: "1 1 300px" }}>
+              <h2 style={{ fontFamily: "'Oswald', sans-serif", color: "#f8fafc", fontSize: 28, margin: 0 }}>WARMTH RANKINGS</h2>
+              <p style={{ color: "#94a3b8", fontSize: 13, margin: "6px 0 0", lineHeight: 1.5 }}>All {data.length} shows ranked by warmth score — the % of lyrical themes tagged as love, joy, community, hope, or cultural pride. Click any bar to explore.</p>
+            </div>
+            <div style={{ background: "#0f172a", border: "2px solid #2A9D8F44", borderRadius: 12, padding: 16, textAlign: "center", minWidth: 160 }}>
+              <div style={{ fontSize: 11, color: "#2A9D8F", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase" }}>Bad Bunny 2026</div>
+              <div style={{ fontSize: 40, fontWeight: 900, color: "#2A9D8F", fontFamily: "'Oswald', sans-serif", lineHeight: 1 }}>#{bbRank}</div>
+              <div style={{ fontSize: 12, color: "#94a3b8" }}>{bb?.warmth}% warmth</div>
+            </div>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+            {ranked.map((show, i) => {
+              const isBB = show.year === 2026;
+              return (
+                <div key={show.year} onClick={() => onSelect(show)} style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer", padding: "2px 0" }}>
+                  <span style={{ width: 22, fontSize: 11, color: isBB ? "#2A9D8F" : i < 3 ? "#F4A261" : "#475569", fontWeight: 700, textAlign: "right" }}>{i + 1}</span>
+                  <span style={{ width: 36, fontSize: 12, fontWeight: 900, color: isBB ? "#2A9D8F" : "#94a3b8" }}>{show.year}</span>
+                  <div style={{ flex: 1, height: 22, background: "#1e293b", borderRadius: 4, overflow: "hidden", position: "relative" }}>
+                    <div style={{ width: `${show.warmth}%`, height: "100%", background: isBB ? "linear-gradient(90deg, #2A9D8F, #22c55e)" : i < 3 ? "linear-gradient(90deg, #F4A261, #E76F51)" : "#334155", borderRadius: 4 }} />
+                    <span style={{ position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)", fontSize: 10, color: isBB ? "#fff" : "#b0b8c4", fontWeight: isBB ? 700 : 400, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "85%" }}>
+                      {show.artist.split(" feat.")[0].split(",")[0]} — {show.warmth}% warmth / {show.edge}% edge
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      );
+    }
+
+    function DetailPanel({ show }) {
+      const themes = getThemeCounts(show.songs);
+      const maxC = themes.length > 0 ? themes[0][1] : 1;
+      const w = getWarmth(show.songs), e = getEdge(show.songs);
+      return (
+        <div style={{ background: "#0f172a", border: "1px solid #1e293b", borderRadius: 14, padding: 18, marginTop: 14, animation: "fadeIn 0.3s ease" }}>
+          <div style={{ fontSize: 24, fontWeight: 900, color: "#f8fafc", fontFamily: "'Oswald', sans-serif" }}>{show.year} — {show.artist}</div>
+          <div style={{ fontSize: 11, color: "#94a3b8" }}>Super Bowl {show.sb}</div>
+          <p style={{ color: "#cbd5e1", fontSize: 11, lineHeight: 1.5, marginTop: 6, maxWidth: 600 }}>{show.notes}</p>
+          <div style={{ display: "flex", gap: 10, marginTop: 12, flexWrap: "wrap" }}>
+            {[{ l: "Warmth", v: w + "%", c: "#2A9D8F" }, { l: "Edge", v: e + "%", c: "#E63946" }, { l: "Family", v: show.familyFriendly + "/5", c: "#F4A261" }, { l: "Songs", v: show.songs.length, c: "#3b82f6" }].map(m => (
+              <div key={m.l} style={{ background: "#1e293b", borderRadius: 8, padding: "8px 12px", textAlign: "center", minWidth: 68 }}>
+                <div style={{ fontSize: 20, fontWeight: 900, color: m.c, fontFamily: "'Oswald', sans-serif" }}>{m.v}</div>
+                <div style={{ fontSize: 8, color: "#94a3b8" }}>{m.l}</div>
+              </div>
+            ))}
+          </div>
+          <div style={{ marginTop: 12 }}>
+            <div style={{ fontSize: 10, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>Themes</div>
+            {themes.map(([t, c]) => <ThemeBar key={t} theme={t} count={c} max={maxC} />)}
+          </div>
+          <div style={{ marginTop: 12 }}>
+            <div style={{ fontSize: 10, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>Setlist</div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 4 }}>
+              {show.songs.map((song, i) => (
+                <div key={i} style={{ background: "#1a2332", borderRadius: 6, padding: "6px 8px", borderLeft: "3px solid transparent" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                    <span style={{ color: "#475569", fontSize: 9, fontWeight: 700, minWidth: 14 }}>{i + 1}</span>
+                    <span style={{ fontSize: 11, color: "#e2e8f0", fontWeight: 600 }}>{song.title}</span>
+                  </div>
+                  <div style={{ marginLeft: 19, marginTop: 2, display: "flex", gap: 2, flexWrap: "wrap" }}>
+                    {song.themes.map(t => <ThemePill key={t} theme={t} />)}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function ShowCard({ show, isSelected, onClick }) {
+      const themes = getThemeCounts(show.songs);
+      const w = getWarmth(show.songs);
+      const isBB = show.year === 2026;
+      return (
+        <div onClick={onClick} style={{ background: isSelected ? "#1e293b" : "#0f172a", border: isBB ? "2px solid #2A9D8F" : isSelected ? "2px solid #3b82f6" : "1px solid #1e293b", borderRadius: 10, padding: 12, cursor: "pointer" }}>
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <div style={{ fontSize: 22, fontWeight: 900, color: "#e2e8f0", fontFamily: "'Oswald', sans-serif", lineHeight: 1 }}>{show.year}</div>
+            <div style={{ display: "flex", gap: 1 }}>{[1,2,3,4,5].map(n => <div key={n} style={{ width: 5, height: 5, borderRadius: "50%", background: n <= show.familyFriendly ? "#22c55e" : "#334155" }} />)}</div>
+          </div>
+          <div style={{ fontSize: 11, fontWeight: 700, color: "#f8fafc", marginTop: 4 }}>{show.artist}</div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 2, marginTop: 5 }}>{themes.slice(0, 3).map(([t]) => <ThemePill key={t} theme={t} />)}</div>
+          <div style={{ marginTop: 6, height: 3, background: "#1e293b", borderRadius: 2, overflow: "hidden" }}>
+            <div style={{ width: `${w}%`, height: "100%", background: "linear-gradient(90deg, #2A9D8F, #22c55e)", borderRadius: 2 }} />
+          </div>
+          <div style={{ fontSize: 8, color: "#64748b", marginTop: 1 }}>{w}% warmth • {show.songs.length} songs</div>
+        </div>
+      );
+    }
+
+    function App() {
+      const [page, setPage] = useState("hero");
+      const [view, setView] = useState("rankings");
+      const [selected, setSelected] = useState(null);
+      const [era, setEra] = useState("all");
+
+      const filtered = useMemo(() => {
+        if (era === "all") return halftimeData;
+        if (era === "classic") return halftimeData.filter(d => d.year < 2005);
+        if (era === "rock") return halftimeData.filter(d => d.year >= 2005 && d.year <= 2010);
+        return halftimeData.filter(d => d.year > 2010);
+      }, [era]);
+
+      if (page === "hero") return <HeroPage onEnter={() => setPage("app")} />;
+
+      return (
+        <div style={{ minHeight: "100vh" }}>
+          <div style={{ background: "#0f172a", borderBottom: "1px solid #1e293b", padding: "10px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8, position: "sticky", top: 0, zIndex: 100 }}>
+            <div onClick={() => setPage("hero")} style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: 8 }}>
+              <span style={{ fontSize: 14, fontWeight: 900, fontFamily: "'Oswald', sans-serif", color: "#f8fafc" }}>HALFTIME</span>
+              <span style={{ fontSize: 10, color: "#2A9D8F", fontWeight: 700 }}>THEMES</span>
+            </div>
+            <div style={{ display: "flex", gap: 4 }}>
+              {[{ key: "rankings", label: "Rankings" }, { key: "explore", label: "Explore Shows" }].map(tab => (
+                <button key={tab.key} onClick={() => { setView(tab.key); setSelected(null); }} style={{
+                  background: view === tab.key ? "#2A9D8F" : "transparent", color: view === tab.key ? "#fff" : "#94a3b8",
+                  border: "none", borderRadius: 6, padding: "5px 12px", fontSize: 11, fontWeight: 700, cursor: "pointer"
+                }}>{tab.label}</button>
+              ))}
+            </div>
+          </div>
+
+          <div style={{ maxWidth: 1000, margin: "0 auto", padding: "16px 14px" }}>
+            {view === "rankings" && (
+              <React.Fragment>
+                <RankingView data={halftimeData} onSelect={setSelected} />
+                {selected && <DetailPanel show={selected} />}
+              </React.Fragment>
+            )}
+            {view === "explore" && (
+              <React.Fragment>
+                <h2 style={{ fontFamily: "'Oswald', sans-serif", color: "#f8fafc", fontSize: 24, margin: "0 0 12px" }}>EXPLORE SHOWS</h2>
+                <div style={{ display: "flex", gap: 4, marginBottom: 12, flexWrap: "wrap" }}>
+                  {[{ key: "all", label: "All" }, { key: "classic", label: "1993–2004" }, { key: "rock", label: "2005–2010" }, { key: "modern", label: "2011+" }].map(e => (
+                    <button key={e.key} onClick={() => setEra(e.key)} style={{
+                      background: era === e.key ? "#334155" : "#1e293b", color: era === e.key ? "#f8fafc" : "#64748b",
+                      border: "none", borderRadius: 5, padding: "4px 10px", fontSize: 10, cursor: "pointer"
+                    }}>{e.label}</button>
+                  ))}
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 8 }}>
+                  {filtered.map(show => (
+                    <ShowCard key={show.year} show={show} isSelected={selected?.year === show.year} onClick={() => setSelected(show)} />
+                  ))}
+                </div>
+                {selected && <DetailPanel show={selected} />}
+              </React.Fragment>
+            )}
+            <div style={{ textAlign: "center", padding: "20px 0", color: "#334155", fontSize: 9 }}>
+              {halftimeData.length} shows • {totalSongs} songs • 15 theme categories
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.render(<App />, document.getElementById("root"));
+  </script>
+</body>
+</html>
