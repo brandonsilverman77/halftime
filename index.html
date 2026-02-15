@@ -511,10 +511,10 @@
               const isBB = show.year === 2026;
               return (
                 <div key={show.year} onClick={() => onSelect(show)} style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer", padding: "2px 0" }}>
-                  <span style={{ width: 22, fontSize: 11, color: isBB ? "#2A9D8F" : i < 3 ? "#F4A261" : "#475569", fontWeight: 700, textAlign: "right" }}>{i + 1}</span>
+                  <span style={{ width: 22, fontSize: 11, color: isBB ? "#2A9D8F" : "#475569", fontWeight: 700, textAlign: "right" }}>{i + 1}</span>
                   <span style={{ width: 36, fontSize: 12, fontWeight: 900, color: isBB ? "#2A9D8F" : "#94a3b8" }}>{show.year}</span>
                   <div style={{ flex: 1, height: 22, background: "#1e293b", borderRadius: 4, overflow: "hidden", position: "relative" }}>
-                    <div style={{ width: `${show.warmth}%`, height: "100%", background: isBB ? "linear-gradient(90deg, #2A9D8F, #22c55e)" : i < 3 ? "linear-gradient(90deg, #F4A261, #E76F51)" : "#334155", borderRadius: 4 }} />
+                    <div style={{ width: `${show.warmth}%`, height: "100%", background: isBB ? "linear-gradient(90deg, #2A9D8F, #22c55e)" : "#334155", borderRadius: 4 }} />
                     <span style={{ position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)", fontSize: 10, color: isBB ? "#fff" : "#b0b8c4", fontWeight: isBB ? 700 : 400, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "85%" }}>
                       {show.artist.split(" feat.")[0].split(",")[0]} — {show.warmth}% warmth / {show.edge}% edge
                     </span>
